@@ -1,4 +1,4 @@
-public class Backtracking {
+public class Backtracking1 {
     public static void main(String[] args) {
         solve();
     }
@@ -152,7 +152,7 @@ public class Backtracking {
     }
 
 
-    //
+    //faith: ( I'm In, I'm Out) || If in start from 0, else call to next idx until tar == 0;
     public static int subsQPermutationInfiCoins(int[] coins, int idx, int tar, String asf) {
         if(tar == 0 || idx == coins.length) {
             if(tar == 0) {
