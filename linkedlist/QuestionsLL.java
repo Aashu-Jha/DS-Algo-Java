@@ -133,7 +133,7 @@ public class QuestionsLL {
     }
 
     //Leetcode 21
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+    public ListNode mergeTwoSortedLists(ListNode l1, ListNode l2) {
         ListNode temp = null;
         if(l1 == null && l2 == null) {
             return l1;
@@ -166,5 +166,33 @@ public class QuestionsLL {
         else if(l2 != null) curr.next = l2;
         
         return temp;
+    }
+
+    //Leetcode 148
+    public ListNode sortList(ListNode head) {
+        if(head == null || head.next == null) return head;
+
+        ListNode mid = middleNode2(head);
+        ListNode midNext = mid.next;
+        mid.next = null;
+
+        return mergeTwoSortedLists(sortList(mid), sortList(midNext));
+    }
+
+    //Leetcode 23
+    public ListNode mergeKLists(ListNode[] lists) {
+        if(lists.length == 0) return null;
+        return merge(lists, 0, lists.length - 1);
+    }
+    
+    public ListNode merge(ListNode[] lists, int si , int ei) {
+        if(si == ei) 
+            return lists[si];
+        
+        int mid = (si + ei) / 2;
+        ListNode start = merge(lists, si, mid);
+        ListNode end = merge(lists, mid + 1, ei);
+        
+        return mergeTwoSortedLists(start, end);
     }
 }
