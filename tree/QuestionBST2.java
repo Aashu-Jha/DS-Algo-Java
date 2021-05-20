@@ -225,5 +225,131 @@ public class QuestionBST2 {
         return constructBSTFromPreOrder(arr, -(int)1e9, (int)1e9);
     }
 
+    //Leetcode 337
+    public int rob(TreeNode root) {
+        int[] ans = rob_(root);
+        return Math.max(ans[0], ans[1]);
+    }
+    //Intuition: ans.robbed = left.notrobbed + node.val + right.notroobed;
+    // ans.notroobed = Math.max(left.notrobbed, left.robbed) + Math.max(right.notrobbed, right.roobed);
+    //In this, we are using array but also use class and define robbed , notrobbed.
     
+    public int[] rob_(TreeNode root) {
+        if(root == null) return new int[]{0,0};
+        
+        int[] lans = rob_(root.left);
+        int[] rans = rob_(root.right);
+        
+        int[] myAns = new int[2];
+        myAns[0] = lans[1] + root.val + rans[1];
+        myAns[1] = Math.max(lans[0], lans[1]) + Math.max(rans[0], rans[1]);
+        
+        return myAns;
+    }
+    //[end]
+
+    //Leetcode 653
+    public boolean findTarget(TreeNode root, int k) {
+        if(root == null) return false;
+        Stack<TreeNode> miner = new Stack<TreeNode>(); 
+        fillLeft(root, miner);
+        Stack<TreeNode> maxer = new Stack<TreeNode>(); 
+        fillRight(root, maxer);
+        
+        
+        while(!miner.isEmpty() && !maxer.isEmpty() && miner.peek().val < maxer.peek().val) {
+            int sum = miner.peek().val + maxer.peek().val;
+            
+            if(sum > k) {
+                TreeNode node = maxer.pop();
+                fillRight(node.left, maxer);
+            }else if(sum < k) {
+                TreeNode node = miner.pop();
+                fillLeft(node.right, miner);
+            }else{
+                return true;
+            }
+        }
+        
+        
+        return false;
+    }
+    
+    public void fillLeft(TreeNode root, Stack<TreeNode> st) {
+        TreeNode curr = root;
+        
+        while(curr != null) {
+            st.push(curr);
+            curr = curr.left;
+        }
+    }
+    
+    public void fillRight(TreeNode root, Stack<TreeNode> st) {
+        TreeNode curr = root;
+        
+        while(curr != null) {
+            st.push(curr);
+            curr = curr.right;
+        }
+    }
+    //[end]
+
+
+    //Leetcode 230
+    public int kthSmallest(TreeNode root, int k) {
+        TreeNode curr = root;
+        while(curr != null) {
+            TreeNode next = curr.left;
+            if(next == null) {
+                if(k == 1) return curr.val;
+                k--;
+                curr = curr.right;
+            }
+            else{
+                TreeNode rightMost = rightMostNode(next, curr);
+                if(rightMost.right == null) {
+                    rightMost.right = curr;
+                    curr = curr.left;
+                }else{
+                    rightMost.right = null;
+                    if(k == 1) return curr.val;
+                    k--;
+                    curr = curr.right;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    public static TreeNode rightMostNode(TreeNode next, TreeNode curr) {
+        while(next.right != null && next.right != curr) {
+            next = next.right;
+        }
+        return next;
+    }
+    //[end]
+
+    //Leetcode 1372
+    public int longestZigZag(TreeNode root) {
+        int[] res = dfs(root);
+        return res[2];
+        
+    }
+    
+    // int[] arr; arr[0] = root.left[1], arr[1] = root.right[0], 
+    //arr[2] = max(arr[0],arr[1], left[2], right[2]);
+    public int[] dfs(TreeNode root) {
+        if(root == null) return new int[]{-1,-1,0};
+        
+        int[] arr1 = dfs(root.left);
+        int[] arr2 = dfs(root.right);
+        
+        int[] res = new int[3];
+        res[0] = arr1[1] + 1;
+        res[1] = arr2[0] + 1;
+        res[2] = Math.max(res[1], Math.max(arr1[2], arr2[2]));
+        res[2] = Math.max(res[2], res[0]);
+        return res;
+    }
+    //[end]
 }
