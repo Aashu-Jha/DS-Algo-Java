@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class lvl01 {
@@ -7,7 +8,10 @@ public class lvl01 {
 
     public static void solve() {
         // mazePath();
-        diceCount();
+        // diceCount();
+        // minCostClimbingStairs();
+        printFriendsPairings();
+        // maxCostGoldMine();
     }
 
     public static void diceCount() {
@@ -170,6 +174,171 @@ public class lvl01 {
            }
         }
         return dp.getLast();
+    }
+
+    public static int targetSum(int tar, int[] arr, int[] dp) {
+        if(tar == 0) return dp[tar] = 1;
+
+        if(dp[tar] != 0) return dp[tar];
+
+        int count = 0;
+        for(int i = 0; i< arr.length; i++) {
+            int num = arr[i];
+            if(tar - num >= 0) {
+                count += targetSum(tar - num, arr, dp);
+            }
+        }
+
+        return dp[tar] = count;
+    }
+
+    public static void minCostClimbingStairs() {
+        int[] dp = new int[8];
+        int[] cost = new int[]{1, 3, 2, 21, 32, 11, 22, 13};
+        int minVal = Math.min(minCostClimbingStairsMemo(cost, 0, dp), minCostClimbingStairsMemo(cost, 1, dp));
+        print1D(dp);
+        System.out.println(minVal);
+    }
+
+    public static int minCostClimbingStairsMemo(int[] cost, int i, int[] dp) {
+        if(i >= cost.length - 2) return dp[i] = cost[i];
+
+        if(dp[i] != 0) return dp[i];
+
+        return dp[i] = cost[i] + Math.min(minCostClimbingStairsMemo(cost, i + 1, dp), minCostClimbingStairsMemo(cost, i + 2, dp));
+    }
+
+    public int minCostClimbingStairsDPOpt(int[] cost) {
+        int n = cost.length;
+        int a = cost[n - 1];
+        int b = cost[n - 2];
+        
+        for(int i = cost.length - 3; i >= 0; i--) {
+            int minAll = cost[i] + Math.min(a, b);
+            a = b;
+            b = minAll;
+        }
+        
+        return Math.min(a,b);
+         
+    }
+
+    public static long countFriendsPairings(int n) 
+    { 
+        long[] dp = new long[n + 1];
+        return countFriendsPairingsMemo(n, dp);
+    }
+
+    static long mod = (int) 1e9 + 7;
+    public static long countFriendsPairingsMemo(int n, long[] dp){
+        if(n <= 1) {
+            return dp[n] = 1;
+        }
+
+        if(dp[n] != 0) return dp[n];
+
+        long single = countFriendsPairingsMemo(n - 1, dp);
+        long doublee = countFriendsPairingsMemo(n - 2, dp) * ( n - 1);
+
+        return dp[n] = (single % mod + doublee % mod) % mod;
+    }
+
+    public static void printFriendsPairings() {
+        System.out.println(printFriendsPairings("heel", ""));
+    }
+
+    public static long printFriendsPairings(String friends, String ans) {
+        if(friends.length() <= 0) {
+            System.out.println(ans);
+            return 1;
+        }
+
+        long count = 0;
+        char c = friends.charAt(0);
+        String ros = friends.substring(1);
+        count += printFriendsPairings(ros, ans + c + " ");
+        for(int i = 1; i< friends.length(); i++) {
+            count += printFriendsPairings(friends.substring(1, i) + friends.substring(i + 1), ans + c + "," + friends.charAt(i) + " ");
+        }
+        return count;
+    }
+    
+    public static int maxCostGoldMineMemo(int r , int c, int[][] mine, int[][] dp, int[][] dir) {
+        if(c == mine[0].length - 1) {
+            return dp[r][c] = mine[r][c];
+        }
+
+        if(dp[r][c] != -1) return dp[r][c];
+
+        int count = 0;
+        for(int d = 0; d < 3; d++) {
+            int x = r + dir[d][0];
+            int y = c + dir[d][1];
+            if(x >= 0 && x < mine.length && y < mine[0].length)
+                count = Math.max(count, maxCostGoldMineMemo(x, y, mine, dp, dir));
+        }
+
+        return dp[r][c] = count + mine[r][c];
+    }
+
+    public static int maxCostGoldMineDP(int R , int C, int[][] mine, int[][] dp, int[][] dir) {
+        for(int c = mine[0].length - 1; c >= C; c--) {
+            for(int r = mine.length - 1; r >= R; r--) {
+                if(c == mine[0].length - 1) {
+                    dp[r][c] = mine[r][c];
+                    continue;
+                }
+                // if(dp[r][c] != -1) return dp[r][c];
+        
+                int count = 0;
+                for(int d = 0; d < 3; d++) {
+                    int x = r + dir[d][0];
+                    int y = c + dir[d][1];
+                    if(x >= 0 && x < mine.length && y < mine[0].length)
+                        count = Math.max(count, dp[x][y]); //maxCostGoldMineMemo(x, y, mine, dp, dir)
+                }
+        
+                dp[r][c] = count + mine[r][c];
+            }
+        }
+
+        int maxx = 0;
+        for(int i = 0; i< mine.length; i++) {
+            maxx = Math.max(maxx, dp[i][0]);
+        }
+        return dp[R][C] = maxx;
+    }
+
+    public static void maxCostGoldMine() {
+        int[][] mine = new int[][] {{10,1,5,3},{14,3,7,9},{12,7,2,3},{1,16,4,1}};
+        int[][] dp = new int[4][4];
+        for(int[] ar: dp) Arrays.fill(ar, -1);
+        int[][] dir = new int[][] {{1,1},{0,1},{-1,1}};
+
+
+        System.out.println(maxCostGoldMineDP(0, 0, mine, dp, dir));
+        // int maxx = 0;
+        // for(int i = 0; i< mine.length; i++) {
+        //     maxx = Math.max(maxx, maxCostGoldMineMemo(i,0,mine,dp,dir));
+        // }
+        // System.out.println(maxx);
+    }
+
+    public static long countFriendsPairingsDP(int N, long[] dp ) {
+        for(int n = 0; n <= N ; n++) {
+            if(n <= 1) {
+                dp[n] = 1;
+                continue;
+            }
+
+        // if(dp[n] != 0) return dp[n];
+
+        long single = dp[n - 1]; // countFriendsPairingsMemo(n - 1, dp);
+        long doublee = dp[n - 2] * (n - 1); // countFriendsPairingsMemo(n - 2, dp) * ( n - 1);
+
+        dp[n] = (single % mod + doublee % mod) % mod;
+        }
+        return dp[N];
     }
 
     public static void print1D(int[] arr) {
