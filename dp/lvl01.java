@@ -10,8 +10,10 @@ public class lvl01 {
         // mazePath();
         // diceCount();
         // minCostClimbingStairs();
-        printFriendsPairings();
+        // printFriendsPairings();
         // maxCostGoldMine();
+        // noOfWays();
+        lcs();
     }
 
     public static void diceCount() {
@@ -26,7 +28,7 @@ public class lvl01 {
         int m = 5;
 
 
-        System.out.println(mazePathJumpMemo(0, 0, n - 1, m - 1, new int[n][m]));
+        // System.out.println(mazePathJumpMemo(0, 0, n - 1, m - 1, new int[n][m]));
         System.out.println(mazePathJumpDP(0, 0, n - 1, m - 1, new int[n][m]));
     }
 
@@ -340,6 +342,67 @@ public class lvl01 {
         }
         return dp[N];
     }
+
+    // https://www.geeksforgeeks.org/count-number-of-ways-to-partition-a-set-into-k-subsets/
+    //[start]
+    public static int noOfWays(int n , int k, int[][] dp) {
+        if(k == 1 || n == k) {
+            return dp[n][k] = 1;
+        }
+
+        if(dp[n][k] != 0) return dp[n][k];
+
+        int single = noOfWays(n - 1, k - 1, dp);
+        int multi = noOfWays(n - 1, k, dp) * k;
+
+        return dp[n][k] = single + multi;
+    }
+
+    public static int noOfWaysDP(int N , int K, int[][] dp) {
+        for(int n = 1; n<= N; n++) {
+            for(int k = 1; k<= K; k++ ){
+                if(k == 1 || n == k) {
+                    dp[n][k] = 1;
+                    continue;
+                }
+        
+                int single = dp[n-1][k-1]; // noOfWaysDP(n - 1, k - 1, dp);
+                int multi = dp[n-1][k] * k; // noOfWaysDP(n - 1, k, dp) * k;
+        
+                dp[n][k] = single + multi;
+            }
+        }
+        return dp[N][K];
+    }
+
+    public static int noOfWaysDP(int N , int K) {
+        int[] down = new int[K + 1];
+        down[1] = 1;
+        for(int n = 1; n<= N; n++) {
+            int[] sum = new int[K + 1];
+            for(int k = 1; k<= K; k++ ){
+                if(k == 1 || n == k) {
+                    sum[k] = 1;
+                    continue;
+                }
+        
+                int single = down[k-1]; // noOfWaysDP(n - 1, k - 1, dp);
+                int multi = down[k] * k; // noOfWaysDP(n - 1, k, dp) * k;
+        
+                sum[k] = single + multi;
+            }
+            print1D(down);
+            down = sum;
+        }
+        return down[down.length - 1];
+    }
+
+    public static void noOfWays() {
+        // int[][] dp = new int[6][4];
+        System.out.println(noOfWaysDP(5,3));
+        // print2D(dp);
+    }
+    //[end]
 
     public static void print1D(int[] arr) {
         for (int i : arr) {
