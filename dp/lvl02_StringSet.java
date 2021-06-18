@@ -168,4 +168,137 @@ public class lvl02_StringSet{
         return dp[SI][TI];   
     }
 
+    //Leetcode 1458
+    public int maxDotProduct(int[] nums1, int[] nums2) {
+        int N = nums1.length;
+        int M = nums2.length;
+        
+        int[][] dp = new int[N + 1][M + 1];
+        
+        for(int n = 0; n <= N; n++) {
+            for(int m = 0; m <= M; m++) {
+                if(n == 0 || m == 0) {
+                    dp[n][m] = -(int) 1e7;
+                    continue;
+                }
+                int product = nums1[n - 1] * nums2[m - 1];
+                int sumProduct = dp[n - 1][m - 1] + product;
+                int a = dp[n - 1][m];
+                int b= dp[n][m - 1];
+                
+                dp[n][m] = Math.max(Math.max(product, sumProduct), Math.max(a, b));
+            }
+        }
+        return dp[N][M];
+    }
+    
+    //Leetcode 72
+    public int minDistance(String word1, String word2) {
+        if(word1.length() == 0 && word2.length() == 0) return 0;
+        int n = word1.length();
+        int m = word2.length();
+        
+        int[][] dp = new int[n + 1][m + 1];
+        for(int[] a: dp) Arrays.fill(a, -1);
+        return minDistance_memo(word1, word2, n, m, dp);
+    }
+    
+    public int minDistance_memo(String word1, String word2, int n, int m, int[][] dp) {
+        if(n == 0 || m == 0) {
+            if(n == 0 && m == 0) 
+                return dp[n][m] = 0;
+            return dp[n][m] = Math.abs(n - m);
+        }
+        
+        if(dp[n][m] != -1) return dp[n][m];
+        
+        if(word1.charAt(n - 1) == word2.charAt(m - 1)) {
+            return dp[n][m] = minDistance_memo(word1, word2, n - 1, m - 1, dp);
+        }else{
+            int insert = minDistance_memo(word1, word2, n , m - 1, dp);
+            int delete = minDistance_memo(word1, word2, n - 1, m, dp);
+            int replace = minDistance_memo(word1, word2, n - 1, m - 1, dp);
+            
+            return dp[n][m] = Math.min(insert, Math.min(delete, replace)) + 1;
+        }
+    }
+    
+    public int minDistance_DP(String word1, String word2, int N, int M, int[][] dp) {
+        for(int n = 0; n <= N; n++) {
+            for(int m = 0; m <= M; m++) {
+                if(n == 0 || m == 0) {
+                    if(n == 0 && m == 0) {
+                        dp[n][m] = 0;
+                        continue;
+                    }
+                    dp[n][m] = Math.abs(n - m);
+                    continue;
+                }
+
+                if(word1.charAt(n - 1) == word2.charAt(m - 1)) {
+                    dp[n][m] = dp[n - 1][m - 1]; // minDistance_memo(word1, word2, n - 1, m - 1, dp);
+                }else{
+                    int insert = dp[n][m - 1]; // minDistance_memo(word1, word2, n , m - 1, dp);
+                    int delete = dp[n - 1][m]; // minDistance_memo(word1, word2, n - 1, m, dp);
+                    int replace = dp[n - 1][m - 1]; // minDistance_memo(word1, word2, n - 1, m - 1, dp);
+
+                    dp[n][m] = Math.min(insert, Math.min(delete, replace)) + 1;
+                }
+            }
+        }
+        return dp[N][M];
+        
+    }
+    //[end]
+
+    //Leetcode 44
+    public boolean isMatch(String s, String p) {
+        int n = s.length();
+        p = shorten(p);
+        int m = p.length();
+        
+        int[][] dp = new int[n + 1][m + 1];
+        for(int[] a: dp) Arrays.fill(a, -1);
+        return (isMatchMemo(s, p, n, m, dp) == 1);
+        
+    }
+    
+    public String shorten(String p) {
+        if(p.length() == 0) return "";
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append(p.charAt(0));
+        for(int i = 1; i< p.length(); i++) {
+            char c = p.charAt(i);
+            if(c == '*' && c == p.charAt(i - 1)) {
+                
+            }
+            else
+                sb.append(c);
+        }
+        return sb.toString();
+    }
+    
+    public int isMatchMemo(String s, String p, int n, int m, int[][] dp) {
+        if(n == 0 || m == 0) {
+            if(n == 0 && m == 0) return dp[n][m] = 1;
+            else if(m == 1 && p.charAt(m - 1) == '*') return dp[n][m] = 1;
+            return dp[n][m] = 0;
+        }
+        
+        if(dp[n][m] != -1) return dp[n][m];
+        
+        char c = p.charAt(m - 1);
+        if(s.charAt(n - 1) == c || c == '?') return dp[n][m] = isMatchMemo(s, p, n - 1, m - 1, dp);
+        else{
+            if(c == '*'){
+                boolean res = (isMatchMemo(s, p, n - 1, m,dp) == 1) || (isMatchMemo(s, p, n, m - 1,dp) == 1);
+                return dp[n][m] = (res) ? 1 : 0;
+            }
+            else
+                return dp[n][m] = 0;
+        }
+    }
+    //[end]
+
 }
