@@ -301,4 +301,33 @@ public class lvl02_StringSet{
     }
     //[end]
 
+    //[start] GFG countPalindromicSubsequence
+    int M = 1000000007;
+    long countPS(String str)
+    {
+        int n = str.length();
+        long[][] dp = new long[n][n];
+        for(long[] a: dp) Arrays.fill(a, -1);
+        
+        return memo(str, 0, n - 1, dp);
+         
+    }
+    
+    long memo(String s, int i, int j, long[][] dp) {
+        if(i >= j) {
+            return dp[i][j] = (i == j) ? 1 : 0;
+        }
+        
+        if(dp[i][j] != -1) return dp[i][j];
+        
+        long x = memo(s, i + 1, j, dp);
+        long y = memo(s, i, j - 1, dp);
+        long z = memo(s, i + 1, j - 1, dp);
+        
+        return dp[i][j] = (((s.charAt(i) != s.charAt(j)) ? x + y - z + M : x + y + 1)) % M;
+    }
+    //[end]
+
+    
+
 }
