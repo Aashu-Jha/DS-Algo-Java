@@ -15,14 +15,13 @@ public class lvl03_lis {
     }
 
     public static void solve() {
-        int[] nums = new int[]{0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15, 14};
-        // int[] nums = new int[]{2,2,2,2,2};
-        // int[] nums = new int[]{0, 12,2,35,2,6,3,1,6,7,3,9,3};
+        // int[] nums = new int[]{0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15, 14};
+        int[][] nums = new int[][]{{8,1},{1,2},{4,3},{3,4},{5,5},{2,6},{6,7},{7,8}};
         // System.out.println(lengthOfLISDP(nums));
         // System.out.println(minDeletion(nums));
         // System.out.println(maximumSumIncSubs(nums));
         // System.out.println(maximumSumIncSubswithMaxLength(nums));
-        printNoOfLIS(nums);
+        System.out.println(buildingBridges(nums));
         
     }
 
@@ -239,5 +238,46 @@ public class lvl03_lis {
         for(Integer i : list.get(len - 1)) {
             if(i < idx && nums[i] < nums[idx]) printAllLIS(list, nums, i, len - 1, ans + nums[i] + ", ");
         }
+    }
+    //[end]
+
+    // https://www.geeksforgeeks.org/dynamic-programming-building-bridges/
+    public static int buildingBridges(int[][] nums) {
+        Arrays.sort(nums, (a, b) -> {
+            return a[0] - b[0];
+        });
+
+        int[] dp = new int[nums.length];
+        int max = 0;
+        for(int i = 0; i< nums.length; i++) {
+            dp[i] = 1;
+            for(int j = i - 1; j >= 0; j--) {
+                if(nums[j][1] < nums[i][1]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            max = Math.max(max, dp[i]);
+        }
+        return max;
+    }
+
+    //Leetcode 354
+    public int maxEnvelopes(int[][] nums) {
+        Arrays.sort(nums, (a, b) -> {
+            return a[0] - b[0];
+        });
+
+        int[] dp = new int[nums.length];
+        int max = 0;
+        for(int i = 0; i< nums.length; i++) {
+            dp[i] = 1;
+            for(int j = i - 1; j >= 0; j--) {
+                if(nums[j][0] < nums[i][0] && nums[j][1] < nums[i][1]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            max = Math.max(max, dp[i]);
+        }
+        return max;
     }
 }
