@@ -21,7 +21,8 @@ public class lvl04_tar {
     
     public static void solve() {
         // coinChange();
-        noOfVariables();
+        // noOfVariables();
+        isSubset();
     }
 
     public static void coinChange() {
@@ -53,6 +54,7 @@ public class lvl04_tar {
         return dp[tar] = count;
     }
 
+    //Leetcode 377
     public static int coinChangePermuteInfiDP(int[] coins, int Tar) {
         int[] dp = new int[Tar + 1];
         dp[0] = 1;
@@ -154,4 +156,112 @@ public class lvl04_tar {
 
         return count;
     }
+
+    // https://www.geeksforgeeks.org/subset-sum-problem-dp-25/
+    public static void isSubset() {
+        int[] nums = new int[]{2,3,5,7};
+        int tar = 10;
+
+        int[][] dp =new int[nums.length + 1][tar + 1];
+        System.out.println(subsetCountTab(nums, tar, nums.length, dp));
+    } 
+
+    public static int isSubset(int[] nums, int tar, int idx, int[][] dp) {
+        if(idx == nums.length || tar == 0) return dp[idx][tar] = (tar == 0) ? 1 : 0;
+
+        if(dp[idx][tar] != -1 ) return dp[idx][tar];
+
+        int num = nums[idx];
+        boolean res = false;
+        if(tar - num >= 0) 
+            res = res || (isSubset(nums, tar - num, idx + 1, dp) == 1);
+        res = res || (isSubset(nums, tar, idx + 1, dp) == 1);
+
+        return dp[idx][tar] = (res) ? 1 : 0;
+    }
+
+    public static int subsetCountTab(int[] nums, int TAR, int IDX, int[][] dp) {
+        for(int idx = 1; idx <= IDX; idx++) {
+            for(int tar = 0; tar <= TAR; tar++) {
+                if(tar == 0) {
+                    dp[idx][tar] = 1;
+                    continue;
+                }
+
+                int num = nums[idx - 1];
+                int count = 0;
+                if(tar - num >= 0) 
+                    count += dp[idx - 1][tar - num]; // isSubset(nums, tar - num, idx + 1);
+                count += dp[idx - 1][tar]; // isSubset(nums, tar, idx + 1);
+
+                dp[idx][tar] = count;
+            }
+        }
+        return dp[IDX][TAR];
+    }
+    //[end]
+
+    //Leetcode 494
+    public int findTargetSumWays(int[] nums, int target) {
+        int sum = 0;
+        int n = nums.length;
+        for(int num: nums) sum += num;
+        
+        if(target < -sum || target > sum) return 0;
+        
+        int[][] dp =new int[n + 1][2 * sum + 1];
+        for(int[] a: dp) Arrays.fill(a, -1);
+        return findTargetSumWays(nums, 0, target + sum, sum, dp);
+    }
+    
+    public int findTargetSumWays(int[] nums,int idx, int tar, int sum, int[][] dp) {
+        if(idx == nums.length) {
+            return dp[idx][sum] = (tar == sum) ? 1 : 0;
+        }
+        
+        if(dp[idx][sum] != -1) return dp[idx][sum];
+        
+        int count = 0;
+        int num = nums[idx];
+        count += findTargetSumWays(nums, idx + 1, tar, sum - num, dp);
+        count += findTargetSumWays(nums, idx + 1, tar, sum + num, dp);
+        
+        return dp[idx][sum] = count;
+    }
+    // [end]
+
+    // Leetcode 698
+    public boolean canPartitionKSubsets(int[] nums, int k) {
+        int sum = 0;
+        int max = 0;
+        for(int val: nums) {
+            sum += val;
+            max = Math.max(max, val);
+        }
+        
+        if(sum % k != 0 || max > sum / k) return false;
+        
+        boolean[] vis = new boolean[nums.length];
+        return backtrack(nums, k, 0, 0, sum / k, vis);
+    }
+    
+    public boolean backtrack(int[] nums, int k, int idx, int sumS, int tar, boolean[] vis) {
+        if(k == 0) return true;
+        if(sumS > tar) return false;
+        if(sumS == tar) {
+            return backtrack(nums, k - 1 , 0, 0, tar, vis);
+        }
+        
+        boolean res = false;
+        for(int i = idx; i < nums.length; i++) {
+            if(!vis[i]) {
+                vis[i] = true;
+                res = res || backtrack(nums, k , i + 1, sumS + nums[i], tar, vis);
+                vis[i] = false;
+            }
+        }
+        
+        return res;
+    }
+    // [end]
 }

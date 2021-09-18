@@ -186,7 +186,7 @@ public class QuestionsLL {
         ListNode midNext = mid.next;
         mid.next = null;
 
-        return mergeTwoSortedLists(sortList(mid), sortList(midNext));
+        return mergeTwoSortedLists(sortList(head), sortList(midNext));
     }
 
     // Leetcode 23
@@ -260,7 +260,7 @@ public class QuestionsLL {
             cur = cur.next;
         }
 
-        if (pre.val != cur.val) { // the last node needs to be dealt with independently
+        if (pre.val != cur.val) { // the last node needs to be dealt independently
             first.next = cur;
             first = first.next;
         }
